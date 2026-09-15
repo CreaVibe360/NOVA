@@ -1,0 +1,6 @@
+__pycache__/
+*.py[cod]
+*.log
+.git/
+.github/
+nova_chromium_profile/
