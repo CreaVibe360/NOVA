@@ -1617,14 +1617,30 @@ sessions_lock = threading.RLock()
 
 chromium_process = None
 
-
 # ============================================================
 # CORS
 # ============================================================
 
+@app.before_request
+def set_cors_headers():
+    """Set CORS headers for all requests, including redirects"""
+    # Allow requests from any origin
+    if request.method == "OPTIONS":
+        response = Response(status=204)
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        response.headers["Access-Control-Allow-Methods"] = (
+            "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+        )
+        response.headers["Access-Control-Allow-Headers"] = (
+            "Content-Type, X-Nova-Session, X-Nova-Client, Accept, Origin"
+        )
+        response.headers["Access-Control-Max-Age"] = "86400"
+        return response
+
+
 @app.after_request
 def cors(response):
-    # Autorise le client NOVA ouvert depuis file:// ou depuis un autre domaine.
+    """Apply CORS headers to all responses"""
     response.headers["Access-Control-Allow-Origin"] = "*"
     response.headers["Access-Control-Allow-Methods"] = (
         "GET, POST, PUT, PATCH, DELETE, OPTIONS"
@@ -1642,7 +1658,6 @@ def cors(response):
 @app.route("/api/<path:path>", methods=["OPTIONS"])
 def options_api(path):
     return Response(status=204)
-
 
 # ============================================================
 # CHROMIUM
