@@ -1624,19 +1624,18 @@ chromium_process = None
 
 @app.after_request
 def cors(response):
-    response.headers["Access-Control-Allow-Origin"] = (
-        CONFIG.cors_origin
+    # Autorise le client NOVA ouvert depuis file:// ou depuis un autre domaine.
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = (
+        "GET, POST, PUT, PATCH, DELETE, OPTIONS"
     )
-    response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
     response.headers["Access-Control-Allow-Headers"] = (
-        "Content-Type, X-Nova-Session, X-Nova-Client"
+        "Content-Type, X-Nova-Session, X-Nova-Client, Accept, Origin"
     )
-    response.headers["Access-Control-Expose-Headers"] = "X-Nova-Session"
-    response.headers["Cache-Control"] = "no-store"
-
-    if request.headers.get("Access-Control-Request-Private-Network"):
-        response.headers["Access-Control-Allow-Private-Network"] = "true"
-
+    response.headers["Access-Control-Expose-Headers"] = (
+        "X-Nova-Session, Content-Type"
+    )
+    response.headers["Access-Control-Max-Age"] = "86400"
     return response
 
 
